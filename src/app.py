@@ -269,4 +269,4 @@ elif menu == "Agrupamento de Causa Raiz":
             """).fetchdf()
             st.table(examples)
 
-con.close()
+
