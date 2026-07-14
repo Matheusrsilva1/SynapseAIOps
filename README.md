@@ -24,7 +24,7 @@ O **Synapse AIOps** aborda o problema através de três pilares de Inteligência
 
 ---
 
-## 💡 Como Funciona o Synapse AIOps (De forma super simples)
+## 💡 Como Funciona o Synapse AIOps
 
 Imagine que a Locaweb é um pronto-socorro digital gigante. Em vez de pacientes, ela atende chamados de servidores e sites com problemas. Veja como nossa solução resolve a confusão do início ao fim:
 
@@ -69,7 +69,7 @@ O fluxo de dados da aplicação está estruturado em camadas de engenharia de da
 
 ---
 
-## 📁 Estrutura de Arquivos (De forma super simples)
+## 📁 Estrutura de Arquivos
 
 Para fazer toda essa inteligência funcionar, o projeto é dividido em três arquivos principais de código:
 
