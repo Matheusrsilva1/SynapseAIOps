@@ -55,6 +55,16 @@ O fluxo de dados da aplicação está estruturado em camadas de engenharia de da
 
 ---
 
+## 📁 Estrutura de Arquivos (De forma super simples)
+
+Para fazer toda essa inteligência funcionar, o projeto é dividido em três arquivos principais de código:
+
+* **[pipeline.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/pipeline.py) (O Organizador de Dados):** Ele pega a planilha de dados brutos da Locaweb, limpa as informações bagunçadas e as organiza em tabelas prontas dentro do nosso banco de dados local.
+* **[models.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/models.py) (O Cérebro da IA):** Ele lê os dados organizados e treina a nossa inteligência artificial para prever o volume de chamados futuros, calcular o risco de atraso (estouro de OLA) e agrupar problemas semelhantes automaticamente.
+* **[app.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/app.py) (A Tela do Dashboard):** É a interface visual interativa (criada com Streamlit) que consome essas previsões e mostra de forma simples para a equipe de suporte onde focar as suas ações.
+
+---
+
 ## 🚀 Como Executar o Projeto Localmente
 
 ### 1. Clonar o repositório
