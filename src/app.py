@@ -204,7 +204,7 @@ elif menu == "Motor de Clarividência":
     future_only['previsao'] = future_only['previsao'].round().astype(int)
     future_only['previsao_min'] = future_only['previsao_min'].round().astype(int)
     future_only['previsao_max'] = future_only['previsao_max'].round().astype(int)
-    st.dataframe(future_only, use_container_width=True)
+    st.dataframe(future_only, width='stretch')
 
 # ==========================================
 # MENU: MOTOR DE RISCO (OLA CLASSIFICATION)
@@ -233,7 +233,7 @@ elif menu == "Motor de Risco (OLA)":
     df_risk_results['risco_ola_prob'] = (df_risk_results['risco_ola_prob'] * 100).round(2).astype(str) + '%'
     
     st.markdown(f"**Total de chamados identificados:** {len(df_risk_results)}")
-    st.dataframe(df_risk_results, use_container_width=True)
+    st.dataframe(df_risk_results, width='stretch')
 
 # ==========================================
 # MENU: AGRUPAMENTO DE CAUSA RAIZ (K-MEANS)
