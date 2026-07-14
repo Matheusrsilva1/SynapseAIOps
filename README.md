@@ -1,4 +1,4 @@
-# 🧠 Synapse AIOps - Inteligência Preditiva e Estabilidade Digital
+# 🧠 Synapse AIOps - Inteligência Preditiva e Estabilidade Digital.
 
 > **FIAP Enterprise Challenge 2026 | Parceria Locaweb**
 > 
