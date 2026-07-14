@@ -65,6 +65,17 @@ Para fazer toda essa inteligência funcionar, o projeto é dividido em três arq
 
 ---
 
+## 💻 Painéis do Dashboard (O que você encontra na tela)
+
+Ao acessar a interface visual desenvolvida em [app.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/app.py), você terá quatro abas de controle:
+
+* **Visão Geral:** Um resumo rápido de tudo o que está acontecendo, mostrando o volume previsto para amanhã, o número total de chamados graves na fila e os alertas críticos de risco de atraso.
+* **Motor de Clarividência:** A previsão do volume de chamados futuros (próximos 7 dias) para ajudar a coordenação a organizar a equipe antes de acontecer um pico de chamados.
+* **Motor de Risco (OLA):** A lista de chamados em aberto classificada pelo risco matemático de atraso (estouro de OLA), garantindo que os técnicos saibam exatamente qual priorizar primeiro.
+* **Agrupamento de Causa Raiz:** O detetive de falhas que junta problemas semelhantes e recorrentes (via clusterização) para que a engenharia resolva a causa raiz comum de uma vez só, em vez de atuar em erros isolados.
+
+---
+
 ## 🚀 Como Executar o Projeto Localmente
 
 ### 1. Clonar o repositório
