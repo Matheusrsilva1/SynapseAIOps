@@ -24,6 +24,20 @@ O **Synapse AIOps** aborda o problema através de três pilares de Inteligência
 
 ---
 
+## 💡 Como Funciona o Synapse AIOps (De forma super simples)
+
+Imagine que a Locaweb é um pronto-socorro digital gigante. Em vez de pacientes, ela atende chamados de servidores e sites com problemas. Veja como nossa solução resolve a confusão do início ao fim:
+
+1. **A Chegada dos Dados (A Triagem):** O sistema recebe a planilha bruta com o histórico de tudo o que deu errado no passado.
+2. **A Organização (A Faxina Digital):** Nosso organizador de dados ([pipeline.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/pipeline.py)) entra em ação. Ele limpa as informações bagunçadas e separa tudo em tabelas organizadas por data, produto e gravidade.
+3. **O Cérebro da Inteligência Artificial ([models.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/models.py)):**
+   - **Previsão do Tempo:** Ele descobre quantos problemas devem chegar amanhã. Isso ajuda o hospital digital a se preparar com analistas suficientes antes de o pico de chamados acontecer.
+   - **Quem Atender Primeiro:** Ele calcula a chance matemática de cada chamado em aberto estourar o limite de tempo contratado. Assim, o chamado com maior risco fura a fila automaticamente para ser resolvido rápido.
+   - **Descobrindo o Culpado Comum:** Em vez de olhar 100 reclamações isoladas, a IA junta as reclamações parecidas em grupos automáticos. Ela avisa: "Olha, essas 100 reclamações são causadas pelo mesmo servidor que caiu."
+4. **O Painel Visual ([app.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/app.py)):** Em vez de telas cheias de códigos, o gestor de suporte olha para um dashboard simples e colorido que indica os próximos passos da operação de forma visual.
+
+---
+
 ## 🏗️ Arquitetura de Dados (Bronze, Prata e Ouro)
 
 O fluxo de dados da aplicação está estruturado em camadas de engenharia de dados dentro de um banco de dados **DuckDB**:
