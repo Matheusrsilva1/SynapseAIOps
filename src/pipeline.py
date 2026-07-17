@@ -1,21 +1,17 @@
 import os
 import pandas as pd
-import duckdb
+from database import DBConnection
 
-# Paths
-base_dir = r"D:\second_brain\knowledge\faculdade\SynapseAIOps"
-data_dir = os.path.join(base_dir, "data")
-db_path = os.path.join(data_dir, "synapse_aiops.db")
-dataset_path = r"D:\second_brain\knowledge\faculdade\Material Locaweb\LW-DATASET.xlsx"
-
-# Ensure directories exist
-os.makedirs(os.path.join(base_dir, "src"), exist_ok=True)
-os.makedirs(data_dir, exist_ok=True)
+# Get paths dynamically
+src_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.dirname(src_dir)
+faculdade_dir = os.path.dirname(base_dir)
+dataset_path = os.path.join(faculdade_dir, "Material Locaweb", "LW-DATASET.xlsx")
 
 print("Starting ETL Pipeline for Synapse AIOps...")
 
-# Connect to DuckDB
-con = duckdb.connect(db_path)
+# Connect to database (Supabase or DuckDB fallback)
+con = DBConnection()
 
 # 1. READ EXCEL & CLEAN COLUMNS (BRONZE LAYER)
 print("Reading raw Excel dataset...")
@@ -41,11 +37,15 @@ df_raw['subcategoria'] = df_raw['subcategoria'].fillna('Nao Informado')
 df_raw['item_configuracao'] = df_raw['item_configuracao'].fillna('Nao Informado')
 df_raw['kpi_violado'] = df_raw['kpi_violado'].fillna('NAO')
 
-# Create Bronze Table in DuckDB
-print("Creating Bronze Layer (raw cleaned data) in DuckDB...")
-con.execute("DROP TABLE IF EXISTS bronze_incidentes")
-con.register('df_raw_temp', df_raw)
-con.execute("CREATE TABLE bronze_incidentes AS SELECT * FROM df_raw_temp")
+# Create Bronze Table in DB
+if con.using_supabase:
+    print("Creating Bronze Layer (raw cleaned data) in Supabase...")
+    df_raw.to_sql("bronze_incidentes", con.engine, if_exists="replace", index=False)
+else:
+    print("Creating Bronze Layer (raw cleaned data) in DuckDB...")
+    con.execute("DROP TABLE IF EXISTS bronze_incidentes")
+    con.duck_con.register('df_raw_temp', df_raw)
+    con.execute("CREATE TABLE bronze_incidentes AS SELECT * FROM df_raw_temp")
 print("Bronze Layer completed.")
 
 # 2. CREATE SILVER LAYER (AGREEMENT & TIMELINE TABLES)
@@ -62,12 +62,12 @@ con.execute("""
         SUM(CASE WHEN prioridade LIKE '%2%' THEN 1 ELSE 0 END) as total_p2,
         SUM(CASE WHEN prioridade LIKE '%3%' THEN 1 ELSE 0 END) as total_p3
     FROM bronze_incidentes
-    GROUP BY data
+    GROUP BY CAST(aberto AS DATE)
     ORDER BY data
 """)
 
 # Table 2: P2/P3 Incidentes for Clusterização (For Padrões - K-Means)
-print("  Creating silver_incidentes_críticos (P2/P3)...")
+print("  Creating silver_incidentes_criticos (P2/P3)...")
 con.execute("DROP TABLE IF EXISTS silver_incidentes_criticos")
 con.execute("""
     CREATE TABLE silver_incidentes_criticos AS
@@ -99,4 +99,5 @@ con.execute("""
 
 print("Silver Layer completed.")
 con.close()
-print("ETL Pipeline completed successfully! Database saved at:", db_path)
+print("ETL Pipeline completed successfully!")
+

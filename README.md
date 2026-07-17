@@ -64,29 +64,30 @@ O fluxo de dados da aplicação está estruturado em camadas de engenharia de da
 
 * **Ingestão & ETL**: Python + DuckDB + Pandas
 * **Modelagem de IA**: Scikit-Learn (K-Means, Random Forest) + XGBoost
-* **Visualização & Dashboard**: Streamlit (Dark Mode)
-* **Banco de Dados**: DuckDB (PostgreSQL-ready para Supabase Cloud)
+* **Visualização & Dashboard**: Streamlit (Premium Dark Glassmorphism Theme)
+* **Banco de Dados**: Supabase Cloud (PostgreSQL relacional) com DuckDB local como fallback automático offline
 
 ---
 
 ## 📁 Estrutura de Arquivos
 
-Para fazer toda essa inteligência funcionar, o projeto é dividido em três arquivos principais de código:
+Para fazer toda essa inteligência funcionar, o projeto é dividido em quatro arquivos principais de código:
 
-* **[pipeline.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/pipeline.py) (O Organizador de Dados):** Ele pega a planilha de dados brutos da Locaweb, limpa as informações bagunçadas e as organiza em tabelas prontas dentro do nosso banco de dados local.
-* **[models.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/models.py) (O Cérebro da IA):** Ele lê os dados organizados e treina a nossa inteligência artificial para prever o volume de chamados futuros, calcular o risco de atraso (estouro de OLA) e agrupar problemas semelhantes automaticamente.
-* **[app.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/app.py) (A Tela do Dashboard):** É a interface visual interativa (criada com Streamlit) que consome essas previsões e mostra de forma simples para a equipe de suporte onde focar as suas ações.
+* **[database.py](src/database.py) (O Conector de Dados):** Gerencia a conexão com o Supabase PostgreSQL na nuvem através do SQLAlchemy e implementa o fallback transparente para o DuckDB local (banco offline).
+* **[pipeline.py](src/pipeline.py) (O Organizador de Dados):** Lê a planilha de dados brutos da Locaweb, executa a faxina digital (limpeza) e carrega as camadas Bronze e Silver diretamente no banco de dados.
+* **[models.py](src/models.py) (O Cérebro da IA):** Executa o treinamento dos modelos (Prophet, XGBoost e K-Means) e salva as projeções analíticas de volumetria, riscos de OLA e clusters de causa raiz na camada Gold.
+* **[app.py](src/app.py) (O Dashboard Operacional):** Interface Streamlit em Dark Mode com visual premium e painéis didáticos explicativos que guiam as ações da equipe de ITSM a partir das predições da IA.
 
 ---
 
 ## 💻 Painéis do Dashboard (O que você encontra na tela)
 
-Ao acessar a interface visual desenvolvida em [app.py](file:///D:/second_brain/knowledge/faculdade/SynapseAIOps/src/app.py), você terá quatro abas de controle:
+Ao acessar a interface visual desenvolvida em [app.py](src/app.py), você terá quatro abas de controle:
 
-* **Visão Geral:** Um resumo rápido de tudo o que está acontecendo, mostrando o volume previsto para amanhã, o número total de chamados graves na fila e os alertas críticos de risco de atraso.
-* **Motor de Clarividência:** A previsão do volume de chamados futuros (próximos 7 dias) para ajudar a coordenação a organizar a equipe antes de acontecer um pico de chamados.
-* **Motor de Risco (OLA):** A lista de chamados em aberto classificada pelo risco matemático de atraso (estouro de OLA), garantindo que os técnicos saibam exatamente qual priorizar primeiro.
-* **Agrupamento de Causa Raiz:** O detetive de falhas que junta problemas semelhantes e recorrentes (via clusterização) para que a engenharia resolva a causa raiz comum de uma vez só, em vez de atuar em erros isolados.
+* **Visão Geral:** Um resumo de todos os motores em cards premium, com gráficos rápidos de tendência e os 5 chamados de maior criticidade imediata na fila.
+* **Motor de Clarividência:** Gráficos interativos com a previsão da carga de chamados futuros (próximos 7 dias) e intervalos de confiança para escala técnica pré-ativa.
+* **Motor de Risco (OLA):** Fila de chamados em aberto ordenados pelo risco matemático de estouro de tempo (calculado pelo XGBoost) e indicação de nível de ação (N1, N2 e N3).
+* **Agrupamento de Causa Raiz:** Mapeamento de problemas crônicos agrupados por semelhança técnica (K-Means), revelando o MTTR histórico e exemplos de falhas parecidas.
 
 ---
 
@@ -104,19 +105,27 @@ Certifique-se de usar o Python 3.12 ou superior.
 pip install -r requirements.txt
 ```
 
-### 3. Rodar o Pipeline de Dados (ETL)
-Isso criará o banco de dados `data/synapse_aiops.db` e processará o dataset da Locaweb nas camadas Bronze e Silver:
+### 3. Configurar as Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto baseado no [.env.example](.env.example):
+```bash
+# Cole sua string de conexão URI do console do Supabase
+SUPABASE_DB_URL=postgresql://postgres:[PASSWORD]@[HOST]:6543/postgres
+```
+*Nota: Se o arquivo `.env` não for criado ou a URL estiver ausente, o sistema utilizará o banco de dados DuckDB local de forma automática.*
+
+### 4. Rodar o Pipeline de Dados (ETL)
+Isso conectará ao banco de dados e processará o dataset da Locaweb estruturando as tabelas Bronze e Silver:
 ```bash
 python src/pipeline.py
 ```
 
-### 4. Executar o Treinamento dos Modelos de IA
-Este script executa as análises preditivas, calcula os scores de risco de OLA e agrupa as causas raiz, salvando as tabelas Gold no banco de dados local:
+### 5. Executar o Treinamento dos Modelos de IA
+Este script executa as análises preditivas dos 3 motores e grava as tabelas Gold com os resultados de inteligência no banco:
 ```bash
 python src/models.py
 ```
 
-### 5. Iniciar o Painel Streamlit
+### 6. Iniciar o Painel Streamlit
 Suba a interface gráfica interativa do projeto:
 ```bash
 python -m streamlit run src/app.py

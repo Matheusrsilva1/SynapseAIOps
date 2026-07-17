@@ -1,21 +1,16 @@
 import os
 import pandas as pd
 import numpy as np
-import duckdb
+from database import DBConnection
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
-# Paths
-base_dir = r"D:\second_brain\knowledge\faculdade\SynapseAIOps"
-data_dir = os.path.join(base_dir, "data")
-db_path = os.path.join(data_dir, "synapse_aiops.db")
-
 print("Starting Model Training for Synapse AIOps...")
 
-# Connect to DuckDB
-con = duckdb.connect(db_path)
+# Connect to database (Supabase or DuckDB fallback)
+con = DBConnection()
 
 # ==========================================
 # 1. MOTOR DE CLARIVIDÊNCIA (VOLUMETRIA PREDICT)
@@ -82,10 +77,14 @@ if len(df_vol) > 10:
         df_forecast = pd.concat([hist_df, future_df_final], ignore_index=True)
         df_forecast = df_forecast.tail(372)
 
-    con.execute("DROP TABLE IF EXISTS gold_previsoes_volumetry")
-    con.register('df_forecast_temp', df_forecast)
-    con.execute("CREATE TABLE gold_previsoes_volumetry AS SELECT * FROM df_forecast_temp")
-    print("  Clarividência model predictions saved to DuckDB.")
+    # Save to Database
+    if con.using_supabase:
+        df_forecast.to_sql("gold_previsoes_volumetry", con.engine, if_exists="replace", index=False)
+    else:
+        con.execute("DROP TABLE IF EXISTS gold_previsoes_volumetry")
+        con.duck_con.register('df_forecast_temp', df_forecast)
+        con.execute("CREATE TABLE gold_previsoes_volumetry AS SELECT * FROM df_forecast_temp")
+    print("  Clarividência model predictions saved to Database.")
 else:
     print("  Insufficient historical data for Clarividência.")
 
@@ -107,6 +106,10 @@ if len(df_risk) > 0:
         le = LabelEncoder()
         df_risk[col] = le.fit_transform(df_risk[col].astype(str))
         encoders[col] = le
+        
+    # Convert numerical features from PostgreSQL (like Numeric/Decimal) to float for XGBoost
+    df_risk['hora_abertura'] = pd.to_numeric(df_risk['hora_abertura'], errors='coerce').fillna(0).astype(float)
+    df_risk['dia_semana_abertura'] = pd.to_numeric(df_risk['dia_semana_abertura'], errors='coerce').fillna(0).astype(float)
         
     X_cols = cat_cols + ['hora_abertura', 'dia_semana_abertura']
     X = df_risk[X_cols].fillna(0)
@@ -130,10 +133,14 @@ if len(df_risk) > 0:
     df_risk_output = con.execute("SELECT numero, prioridade, produto, categoria, duracao, grupo_designado, aberto_por, kpi_violado FROM silver_ola_features").fetchdf()
     df_risk_output['risco_ola_prob'] = probs
     
-    con.execute("DROP TABLE IF EXISTS gold_risco_ola")
-    con.register('df_risk_temp', df_risk_output)
-    con.execute("CREATE TABLE gold_risco_ola AS SELECT * FROM df_risk_temp")
-    print("  Motor de Risco predictions saved to DuckDB.")
+    # Save to Database
+    if con.using_supabase:
+        df_risk_output.to_sql("gold_risco_ola", con.engine, if_exists="replace", index=False)
+    else:
+        con.execute("DROP TABLE IF EXISTS gold_risco_ola")
+        con.duck_con.register('df_risk_temp', df_risk_output)
+        con.execute("CREATE TABLE gold_risco_ola AS SELECT * FROM df_risk_temp")
+    print("  Motor de Risco predictions saved to Database.")
 else:
     print("  No risk features available.")
 
@@ -166,12 +173,17 @@ if len(df_pat) > 0:
         
     df_pat['cluster_nome'] = df_pat['cluster_id'].map(cluster_names)
     
-    con.execute("DROP TABLE IF EXISTS gold_clusters_padroes")
-    con.register('df_pat_temp', df_pat)
-    con.execute("CREATE TABLE gold_clusters_padroes AS SELECT * FROM df_pat_temp")
-    print("  Motor de Detecção de Padrões clusters saved to DuckDB.")
+    # Save to Database
+    if con.using_supabase:
+        df_pat.to_sql("gold_clusters_padroes", con.engine, if_exists="replace", index=False)
+    else:
+        con.execute("DROP TABLE IF EXISTS gold_clusters_padroes")
+        con.duck_con.register('df_pat_temp', df_pat)
+        con.execute("CREATE TABLE gold_clusters_padroes AS SELECT * FROM df_pat_temp")
+    print("  Motor de Detecção de Padrões clusters saved to Database.")
 else:
     print("  No critical incidents for pattern clustering.")
 
 con.close()
 print("Model training pipeline completed successfully!")
+

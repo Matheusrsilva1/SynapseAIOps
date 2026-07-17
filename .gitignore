@@ -1,0 +1,21 @@
+# Ambientes virtuais e pacotes
+.venv/
+venv/
+ENV/
+env/
+
+# Configurações locais e segredos (CRÍTICO)
+.env
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Banco de dados local (DuckDB fallback / SQLite)
+data/synapse_aiops.db
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
